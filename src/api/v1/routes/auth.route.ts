@@ -9,14 +9,14 @@ import {
   resetPasswordPage,
   sendMailHandler,
   verifyHandler
-} from '../controllers/auth.controller'
-import { autheticate, apiLimiter, validate } from '../middlewares'
+} from '@api-v1/controllers/auth.controller'
+import { authenticate, apiLimiter, validate } from '@api-v1/middlewares'
 import {
   createUserSchema,
   forgotPasswordSchema,
   loginSchema,
   resetPasswordSchema
-} from '../validator-schema/user.schema'
+} from '@api-v1/validator-schema/user.schema'
 
 const router = Router()
 
@@ -24,9 +24,9 @@ router.get('/hi', (req: Request, res: Response) => {
   res.send('hi')
 })
 
-router.get('/', autheticate, authUserHandler)
+router.get('/', authenticate, authUserHandler)
 
-router.get('/logout', autheticate, logoutHandler)
+router.get('/logout', authenticate, logoutHandler)
 
 router.get('/verify/:token', verifyHandler)
 
@@ -38,7 +38,7 @@ router.post('/signup', createUserSchema, validate, signupHandler)
 
 router.post('/login', loginSchema, validate, loginHandler)
 
-router.post('/send-mail', apiLimiter, validate, sendMailHandler)
+router.post('/send-mail', apiLimiter(), validate, sendMailHandler)
 
 router.post('/forgot-password', forgotPasswordSchema, validate, forgotPasswordHandler)
 

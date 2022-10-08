@@ -1,4 +1,4 @@
-import { AuthType, Role } from '../types'
+import { AuthType, Role } from '@api-v1/types'
 import { model, Schema, Document } from 'mongoose'
 import { hash, compare } from 'bcrypt'
 
@@ -43,7 +43,7 @@ const userSchema = new Schema(
     role: {
       type: String,
       enum: {
-        values: [Role.USER, Role.ADMIN],
+        values: [Role.USER, Role.ADMIN, Role.MANAGER],
         message: '{VALUE} is not supported'
       },
       default: Role.USER
@@ -62,7 +62,13 @@ const userSchema = new Schema(
     }
   },
   {
-    timestamps: true
+    timestamps: true,
+    toJSON: {
+      transform(doc, ret) {
+        ret.id = ret._id
+        delete ret._id
+      }
+    }
   }
 )
 

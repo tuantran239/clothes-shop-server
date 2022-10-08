@@ -10,6 +10,7 @@ import passport from 'passport'
 import consumer from './worker/consumer'
 import { deserializeUser, setSwagger } from './middlewares'
 import { cloudinaryConf, serverConf } from '@config'
+import { connect } from '@api-v1/utils/redis'
 
 import './utils/passport'
 
@@ -19,16 +20,18 @@ cloudinary.v2.config({
   api_secret: cloudinaryConf.cloudinaryApiSecret
 })
 
+connect()
+
 const app = express()
-app.use(bodyParser.json({ limit: '10mb' }))
-app.use(bodyParser.urlencoded({ extended: true }))
-app.use(cookieParser())
 app.use(
   cors({
-    origin: serverConf.clientUrl,
+    origin: [serverConf.clientUrl, serverConf.adminUrl],
     credentials: true
   })
 )
+app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.json({ limit: '100mb' }))
+app.use(cookieParser())
 app.use(
   session({
     secret: process.env.SESSION_SECRET as string,

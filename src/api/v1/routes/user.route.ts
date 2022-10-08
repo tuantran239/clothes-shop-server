@@ -3,32 +3,40 @@ import {
   updateInfoHandler,
   updatePasswordHandler,
   uploadAvatarHandler
-} from '../controllers/user.controller'
-import { autheticate } from '../middlewares/authenticate'
-import { uploadSingeFile, validate } from '../middlewares'
+} from '@api-v1/controllers/user.controller'
+import {
+  apiLimiter,
+  authenticate,
+  multerSingleFile,
+  validate
+} from '@api-v1/middlewares'
 import {
   updateInfoSchema,
   updatePasswordSchema
-} from '../validator-schema/user.schema'
+} from '@api-v1/validator-schema/user.schema'
 
 const router = Router()
 
 router.post(
   '/upload-avatar',
-  autheticate,
-  uploadSingeFile('avatar'),
+  authenticate,
+  multerSingleFile('avatar'),
   uploadAvatarHandler
 )
 
-router.patch('/update-info',
-  autheticate,
+router.patch(
+  '/update-info',
+  apiLimiter(3),
+  authenticate,
   updateInfoSchema,
   validate,
-  updateInfoHandler)
+  updateInfoHandler
+)
 
 router.patch(
   '/update-password',
-  autheticate,
+  apiLimiter(5),
+  authenticate,
   updatePasswordSchema,
   validate,
   updatePasswordHandler

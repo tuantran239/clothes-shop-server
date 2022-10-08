@@ -1,13 +1,12 @@
 import { NextFunction, Request, Response } from 'express'
-import { getUserExist } from '../services/user.service'
+import { getUserExist } from '@api-v1/services/user.service'
 import {
   generateError,
   InternalServerErrorResponse,
   UnauthorizedResponse
 } from '../error/http-error'
-import { hGetAuth, hSetAuth } from '../services/redis.service'
 
-export const autheticate = async (
+export const authenticate = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -17,29 +16,20 @@ export const autheticate = async (
     return UnauthorizedResponse(res, generateError('unauthorized', 'user'))
   }
 
-  let user: any | null = null
-  const userJson = await hGetAuth(userId)
-
-  if (userJson) {
-    user = userJson
-  } else {
-    const { data, error } = await getUserExist(
-      false,
-      { _id: userId },
-      '-password -token'
-    )
-    if (error) {
-      return InternalServerErrorResponse(res, error.error)
-    } else {
-      user = data!
-      await hSetAuth(userId, user)
-    }
+  const { data: user, error } = await getUserExist(
+    false,
+    { _id: userId },
+    '-password -token'
+  )
+  if (error) {
+    return InternalServerErrorResponse(res, error.error)
   }
-  if (user && !user.active) {
-    return UnauthorizedResponse(res, generateError(
-      'account not active',
-      'user'
-    ))
+
+  if (!user?.active) {
+    return UnauthorizedResponse(
+      res,
+      generateError('account not active', 'user')
+    )
   }
   res.locals.user = user
   next()

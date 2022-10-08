@@ -4,7 +4,7 @@ import {
   QueryOptions,
   UpdateQuery
 } from 'mongoose'
-import Session, { SessionDocument } from '../models/Session'
+import Session, { SessionDocument } from '@api-v1/models/Session'
 import {
   createDoc,
   getDoc,
@@ -20,8 +20,8 @@ export const createSession = (body: Partial<SessionDocument>) =>
 export const getSessionExist = (
   exist: boolean,
   filter?: FilterQuery<SessionDocument>,
-  projection?: ProjectionType<SessionDocument> | null,
-  options?: QueryOptions<SessionDocument> | null
+  projection?: ProjectionType<SessionDocument>,
+  options?: QueryOptions<SessionDocument>
 ) =>
   docExist(
     'Error get Session exist',
@@ -35,23 +35,23 @@ export const getSessionExist = (
 
 export const getSession = (
   filter?: FilterQuery<SessionDocument>,
-  projection?: ProjectionType<SessionDocument> | null,
-  options?: QueryOptions<SessionDocument> | null
+  projection?: ProjectionType<SessionDocument>,
+  options?: QueryOptions<SessionDocument>
 ) => getDoc('Error get session', Session, filter, projection, options)
 
 export const getAllSession = (
   filter: FilterQuery<SessionDocument>,
-  projection?: ProjectionType<SessionDocument> | null,
-  options?: QueryOptions<SessionDocument> | null
+  projection?: ProjectionType<SessionDocument>,
+  options?: QueryOptions<SessionDocument>
 ) => getAllDocs('Error get all sessions', Session, filter, projection, options)
 
 export const deleteSession = (
   filter: FilterQuery<SessionDocument>,
-  options?: QueryOptions<SessionDocument> | null
+  options?: QueryOptions<SessionDocument>
 ) => deleteDoc('Error delete session', Session, filter, options)
 
 export const updateSession = (
   filter: FilterQuery<SessionDocument>,
   update?: UpdateQuery<SessionDocument>,
-  options?: QueryOptions<SessionDocument> | null
+  options?: QueryOptions<SessionDocument>
 ) => updateDoc('Error update session', Session, filter, update, options)

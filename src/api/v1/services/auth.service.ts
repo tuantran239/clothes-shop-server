@@ -1,19 +1,19 @@
-import { AuthType } from '../types'
-import User from '../models/User'
-import { throwValidationError } from '../error/mongodb-error'
-import { FuncHandleService } from '../utils/functions'
-import { sendMail } from '../utils/nodemailer'
-import { mailConf } from '@config'
+import { AuthType } from '@api-v1/types'
+import User from '@api-v1/models/User'
+import { throwValidationError } from '@api-v1/error/mongodb-error'
+import { FuncHandleService } from '@api-v1/utils/functions'
+import { sendMail } from '@api-v1/utils/nodemailer'
+import { mailCons } from '@api-v1/constants'
 
 export const sendLinkVerify = async (email: string, method: string, token: string, link: string) =>
   FuncHandleService('Error send link verify', async () => {
     const href = `${link}/${token}`
     let title = 'verify Email'
     switch (method) {
-      case mailConf.method.register:
+      case mailCons.method.register:
         title = 'Active Account'
         break
-      case mailConf.method.resetPassword:
+      case mailCons.method.resetPassword:
         title = 'Reset Password'
         break
     }
@@ -26,7 +26,7 @@ export const sendLinkVerify = async (email: string, method: string, token: strin
 
 export const authEmailPassword = (email: string, password: string) =>
   FuncHandleService('Error auth email and password', async () => {
-    const user = await User.findOne({ email, authType: AuthType.EMAIL }, 'email password active')
+    const user = await User.findOne({ email, authType: AuthType.EMAIL }, 'email password active role')
     if (!user) {
       throwValidationError('email', 'email not found', true)
     }

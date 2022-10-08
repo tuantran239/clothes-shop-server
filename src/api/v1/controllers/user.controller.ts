@@ -1,13 +1,18 @@
 import { Request, Response } from 'express'
-import { cloudinaryConf } from '@config'
-import { deleteAvatar, getUserExist, updateUser, uploadAvatar } from '../services/user.service'
+import {
+  deleteAvatar,
+  getUserExist,
+  updateUser
+} from '@api-v1/services/user.service'
 import {
   BadRequestResponse,
   CommonErrorResponse,
-  generateError,
-  InternalServerErrorResponse
+  InternalServerErrorResponse,
+  generateError
 } from '../error/http-error'
-import { HttpResponse } from '../utils'
+import { generateAvatarUrl, HttpResponse } from '@api-v1/utils'
+import { uploadFile } from '@api-v1/services/upload.service'
+import { cloudinaryCons } from '@api-v1/constants'
 
 export const uploadAvatarHandler = async (req: Request, res: Response) => {
   const file = req.file
@@ -18,14 +23,20 @@ export const uploadAvatarHandler = async (req: Request, res: Response) => {
     return InternalServerErrorResponse(res, errorDel.error)
   }
 
-  const { error, data: result } = await uploadAvatar(file!!, cloudinaryConf.folder('avatar', user?.id))
+  const { error, data: result } = await uploadFile(
+    cloudinaryCons.folder('avatar', user?.id),
+    file,
+    { width: 320, height: 320 }
+  )
   if (error) {
     return CommonErrorResponse(res, error)
   }
 
   await updateUser(
     { _id: user?.id },
-    { avatar: { public_id: result?.public_id, url: result?.url } }
+    {
+      avatar: result || { public_id: null, url: generateAvatarUrl(user?.name) }
+    }
   )
 
   return HttpResponse(res, 200, { success: true })
@@ -35,7 +46,7 @@ export const updateInfoHandler = async (req: Request, res: Response) => {
   const user = res.locals.user
   const { email, name } = req.body
 
-  const { error } = await updateUser({ _id: user?._id }, { email, name })
+  const { error, data } = await updateUser({ _id: user?.id }, { email, name })
   if (error) {
     return CommonErrorResponse(res, error)
   }
@@ -48,7 +59,7 @@ export const updatePasswordHandler = async (req: Request, res: Response) => {
   const user = res.locals.user
 
   const { error: errorExist, data: u } = await getUserExist(false, {
-    _id: user?._id
+    _id: user?.id
   })
   if (errorExist) {
     return CommonErrorResponse(res, errorExist)
@@ -56,7 +67,10 @@ export const updatePasswordHandler = async (req: Request, res: Response) => {
 
   const isMatch = await u?.comparePassword(password)
   if (!isMatch) {
-    return BadRequestResponse(res, generateError('Password not match', 'password'))
+    return BadRequestResponse(
+      res,
+      generateError('Password not match', 'password')
+    )
   }
 
   u!!.password = newPassword

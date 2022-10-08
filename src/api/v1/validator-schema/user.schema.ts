@@ -3,7 +3,7 @@ import {
   minLength,
   required,
   valid
-} from '../error/validator-error-message'
+} from '@api-v1/error/validator-error-message'
 
 export const createUserSchema = checkSchema({
   name: {

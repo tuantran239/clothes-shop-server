@@ -2,8 +2,6 @@ export { default as awsConf } from './aws'
 
 export { default as cloudinaryConf } from './cloudinary'
 
-export { default as cookieConf } from './cookie'
-
 export { default as dbConf } from './db'
 
 export { default as jwtConf } from './jwt'
@@ -17,3 +15,5 @@ export { default as rabbitmqConf } from './rabbitmq'
 export { default as redisConf } from './redis'
 
 export { default as serverConf } from './server'
+
+export { default as stripeConf } from './stripe'

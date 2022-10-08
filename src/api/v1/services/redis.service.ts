@@ -1,18 +1,13 @@
-import { redisConf } from '@config'
-import { createClient, RedisClientType } from 'redis'
-import { FuncHandleHGet, FuncHandleHSet } from '../utils/functions/functionRedis'
-import { RedisKeys } from '../utils/keys'
+import {
+  FuncHandleHGet,
+  FuncHandleHSet
+} from '@api-v1/utils/functions/functionRedis'
+import { RedisKeys } from '@api-v1/utils/keys'
 
-const client: RedisClientType = createClient({
-  socket: {
-    host: redisConf.host,
-    port: redisConf.port
-  }
-})
+const { productKey } = RedisKeys
 
-const { authKey } = RedisKeys
+export const hSetProduct = async (productId: string, field: any) =>
+  FuncHandleHSet(productKey(productId), field)
 
-export const hSetAuth = async (userId: string, field: any) =>
-  FuncHandleHSet(client, authKey(userId), field)
-
-export const hGetAuth = async (userId: string) => FuncHandleHGet(client, authKey(userId))
+export const hGetProduct = async (productId: string) =>
+  FuncHandleHGet(productKey(productId))
